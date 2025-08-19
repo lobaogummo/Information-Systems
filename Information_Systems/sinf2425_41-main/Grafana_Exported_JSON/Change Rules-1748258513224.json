@@ -1,0 +1,301 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"\n  width: 100%;\n  height: 100px;\n  background: linear-gradient(135deg, #27ae60, #2ecc71);\n  color: white;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 0 30px;\n  font-size: 20px;\n  font-weight: bold;\n  border-radius: 8px;\n  box-sizing: border-box;\n\">\n  <div>⚙️ Change Rules Configuration Dashboard</div>\n  <div>\n    <a href=\"/d/930122ff-4ef3-4351-ae53-f38ad5c228b0/home\" style=\"\n      color: white;\n      text-decoration: underline;\n      font-size: 14px;\n      font-weight: normal;\n      text-decoration: none;\n    \">\n      ⬅ Back to Home\n    </a>\n  </div>\n</div>",
+        "mode": "html"
+      },
+      "pluginVersion": "11.6.0-226762",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "fekohikosxzwgd"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 35,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.0-226762",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "fekohikosxzwgd"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1) DML de add/edit/delete (pode manter igual ao que você já tem)\r\nDO $$\r\nBEGIN\r\n  IF '${action}' = 'delete' AND NULLIF('${rule_id}','') IS NOT NULL THEN\r\n    DELETE FROM dinasore.rules\r\n    WHERE rule_id = NULLIF('${rule_id}','')::integer;\r\n  END IF;\r\n\r\n  IF '${action}' = 'edit' AND NULLIF('${rule_id}','') IS NOT NULL THEN\r\n    -- se normal/anomaly\r\n    IF (SELECT rule_value \r\n         FROM dinasore.rules \r\n         WHERE rule_id = NULLIF('${rule_id}','')::integer\r\n       ) LIKE '%normal_mean=%'\r\n    THEN\r\n      UPDATE dinasore.rules\r\n      SET\r\n        rule_value    =   \r\n          'normal_mean='  || '${normal_mean}'  ||\r\n          ';normal_std='  || '${normal_std}'  ||\r\n          ';anomaly_mean='|| '${anomaly_mean}'||\r\n          ';anomaly_std=' || '${anomaly_std}',\r\n        rule_priority = NULLIF('${rule_priority}','')::integer\r\n      WHERE rule_id = NULLIF('${rule_id}','')::integer;\r\n\r\n    ELSE\r\n      -- activation condition\r\n      UPDATE dinasore.rules\r\n      SET\r\n        rule_value    = 'activate_on_' || '${activation_condition}',\r\n        rule_priority = NULLIF('${rule_priority}','')::integer\r\n      WHERE rule_id = NULLIF('${rule_id}','')::integer;\r\n    END IF;\r\n  END IF;\r\n\r\n  IF '${action}' = 'add' THEN\r\n    IF '${normal_mean}' != '' AND '${normal_std}' != ''\r\n       AND '${anomaly_mean}' != '' AND '${anomaly_std}' != ''\r\n    THEN\r\n      INSERT INTO dinasore.rules(rule_value, rule_priority)\r\n      VALUES(\r\n        'normal_mean='  || '${normal_mean}'  ||\r\n        ';normal_std='  || '${normal_std}'  ||\r\n        ';anomaly_mean='|| '${anomaly_mean}'||\r\n        ';anomaly_std=' || '${anomaly_std}',\r\n        NULLIF('${rule_priority}','')::integer\r\n      );\r\n    ELSIF '${activation_condition}' != '' THEN\r\n      INSERT INTO dinasore.rules(rule_value, rule_priority)\r\n      VALUES(\r\n        'activate_on_'||'${activation_condition}',\r\n        NULLIF('${rule_priority}','')::integer\r\n      );\r\n    END IF;\r\n  END IF;\r\nEND;\r\n$$;\r\n\r\n-- 2) Query principal só de leitura\r\nWITH parsed AS (\r\n  SELECT\r\n    r.rule_id,\r\n    r.rule_priority,\r\n    substring(r.rule_value FROM 'normal_mean=([^;]*)')     AS normal_mean,\r\n    substring(r.rule_value FROM 'normal_std=([^;]*)')      AS normal_std,\r\n    substring(r.rule_value FROM 'anomaly_mean=([^;]*)')    AS anomaly_mean,\r\n    substring(r.rule_value FROM 'anomaly_std=([^;]*)')     AS anomaly_std,\r\n    substring(r.rule_value FROM 'activate_on_(.*)')        AS activation_condition\r\n  FROM dinasore.rules r\r\n)\r\n\r\nSELECT\r\n  -- em ADD, mostramos linha em branco; senão, o id real\r\n  CASE WHEN '${action}' = 'add'\r\n       THEN NULL\r\n       ELSE p.rule_id\r\n  END                           AS rule_id,\r\n\r\n  -- regra de prioridade: use a do form em add/edit, ou a do banco em view\r\n  COALESCE(\r\n    NULLIF('${rule_priority}','')::integer,\r\n    p.rule_priority\r\n  )                              AS rule_priority,\r\n\r\n  -- mesmas táticas para cada campo\r\n  COALESCE(\r\n    CASE WHEN '${action}' = 'add'  THEN '${normal_mean}'\r\n         WHEN '${action}' = 'edit' \r\n              AND p.rule_id = NULLIF('${rule_id}','')::integer \r\n         THEN '${normal_mean}'\r\n    END,\r\n    p.normal_mean\r\n  )                              AS normal_mean,\r\n\r\n  COALESCE(\r\n    CASE WHEN '${action}' = 'add'  THEN '${normal_std}'\r\n         WHEN '${action}' = 'edit' \r\n              AND p.rule_id = NULLIF('${rule_id}','')::integer \r\n         THEN '${normal_std}'\r\n    END,\r\n    p.normal_std\r\n  )                              AS normal_std,\r\n\r\n  COALESCE(\r\n    CASE WHEN '${action}' = 'add'  THEN '${anomaly_mean}'\r\n         WHEN '${action}' = 'edit' \r\n              AND p.rule_id = NULLIF('${rule_id}','')::integer \r\n         THEN '${anomaly_mean}'\r\n    END,\r\n    p.anomaly_mean\r\n  )                              AS anomaly_mean,\r\n\r\n  COALESCE(\r\n    CASE WHEN '${action}' = 'add'  THEN '${anomaly_std}'\r\n         WHEN '${action}' = 'edit' \r\n              AND p.rule_id = NULLIF('${rule_id}','')::integer \r\n         THEN '${anomaly_std}'\r\n    END,\r\n    p.anomaly_std\r\n  )                              AS anomaly_std,\r\n\r\n  COALESCE(\r\n    CASE WHEN '${action}' = 'add'  THEN '${activation_condition}'\r\n         WHEN '${action}' = 'edit' \r\n              AND p.rule_id = NULLIF('${rule_id}','')::integer \r\n         THEN '${activation_condition}'\r\n    END,\r\n    p.activation_condition\r\n  )                              AS activation_condition\r\n\r\nFROM parsed p\r\nWHERE\r\n    -- SEMPRE traz todas em VIEW\r\n    '${action}' = 'view'\r\n    -- ADD também não filtra\r\n OR '${action}' = 'add'\r\n    -- só filtra quando edit/delete e rule_id for preenchido\r\n OR (\r\n      '${action}' IN ('edit','delete')\r\n      AND p.rule_id = NULLIF('${rule_id}','')::integer\r\n    )\r\nORDER BY p.rule_id;\r\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Rules",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "view",
+          "value": "view"
+        },
+        "name": "action",
+        "options": [
+          {
+            "selected": false,
+            "text": "null",
+            "value": "null"
+          },
+          {
+            "selected": true,
+            "text": "view",
+            "value": "view"
+          },
+          {
+            "selected": false,
+            "text": "add",
+            "value": "add"
+          },
+          {
+            "selected": false,
+            "text": "edit",
+            "value": "edit"
+          },
+          {
+            "selected": false,
+            "text": "delete",
+            "value": "delete"
+          }
+        ],
+        "query": "null,view,add,edit,delete",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "rule_id",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "rule_priority",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "normal_mean",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "normal_std",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "anomaly_mean",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "anomaly_std",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "activation_condition",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Change Rules",
+  "uid": "aelhqr876v2f4c",
+  "version": 33
+}

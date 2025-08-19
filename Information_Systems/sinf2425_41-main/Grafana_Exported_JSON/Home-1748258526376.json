@@ -1,0 +1,69 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Home page",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 6,
+  "links": [],
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 35,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"font-family: 'Segoe UI', sans-serif; padding: 40px; max-width: 1000px; margin: auto; color: white;\">\n\n  <!-- Hero Section -->\n  <div style=\"\n    background: linear-gradient(135deg, #2ecc71, #27ae60);\n    color: white;\n    padding: 60px 20px;\n    border-radius: 10px;\n    margin-bottom: 40px;\n    text-align: center;\n    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);\n  \">\n    <h1 style=\"font-size: 42px; margin-bottom: 10px;\">Welcome to GMAN</h1>\n    <p style=\"font-size: 18px;\">Green Manufacturing Information System</p>\n    <p style=\"font-size: 16px; opacity: 0.9;\">Real-time energy monitoring and intelligent control for sustainable factories</p>\n  </div>\n\n  <!-- Project Summary -->\n  <div style=\"margin: 40px auto; max-width: 800px; font-size: 16px; color: #dddddd; line-height: 1.6; text-align: justify;\">\n    <p>\n      <strong>GMAN</strong> (Green Manufacturing Information System) is a smart factory platform designed to help energy-intensive industries optimize operations\n      through real-time monitoring, automated control and data-driven decision-making. It enables production managers and engineers to oversee\n      energy usage, equipment performance and environmental parameters, helping reduce costs and promote sustainable manufacturing.\n    </p>\n  </div>\n\n  <!-- Features Section -->\n  <div style=\"display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 40px;\">\n    <div style=\"\n      background: #1e1e1e;\n      padding: 20px;\n      border-radius: 10px;\n      border-top: 5px solid #2ecc71;\n      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n      width: 280px;\n      text-align: left;\n    \">\n      <h3 style=\"color: #2ecc71; margin-top: 0;\">🌿 Sustainable Manufacturing</h3>\n      <p style=\"font-size: 14px; color: #ccc;\">Reduce energy waste and carbon footprint through real-time insights.</p>\n    </div>\n\n    <div style=\"\n      background: #1e1e1e;\n      padding: 20px;\n      border-radius: 10px;\n      border-top: 5px solid #2ecc71;\n      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n      width: 280px;\n      text-align: left;\n    \">\n      <h3 style=\"color: #2ecc71; margin-top: 0;\">⚙️ Real-Time Control</h3>\n      <p style=\"font-size: 14px; color: #ccc;\">Smart rules and manual overrides to manage actuators on the edge.</p>\n    </div>\n\n    <div style=\"\n      background: #1e1e1e;\n      padding: 20px;\n      border-radius: 10px;\n      border-top: 5px solid #2ecc71;\n      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n      width: 280px;\n      text-align: left;\n    \">\n      <h3 style=\"color: #2ecc71; margin-top: 0;\">📊 Visual Dashboards</h3>\n      <p style=\"font-size: 14px; color: #ccc;\">Interactive panels for monitoring energy, machines and performance.</p>\n    </div>\n  </div>\n\n  <!-- Why GMAN -->\n  <div style=\"margin: 60px auto; max-width: 900px; text-align: center; color: white;\">\n    <h2 style=\"font-size: 24px; color: #2ecc71;\">Why GMAN?</h2>\n    <ul style=\"list-style: none; padding: 0px 225px; font-size: 16px; line-height: 1.8; text-align: justify; color: #ddd;\">\n      <li>✅ Reduce unexpected machine downtime through proactive alerts</li>\n      <li>✅ Lower operational costs with energy-aware control strategies</li>\n      <li>✅ Align with ESG goals by tracking carbon impact and waste</li>\n    </ul>\n  </div>\n\n  <!-- Quick Stats -->\n  <div style=\"display: flex; justify-content: center; gap: 40px; margin: 40px auto 60px auto; max-width: 900px; color: white;\">\n    <div style=\"text-align: center;\">\n      <div style=\"font-size: 32px; font-weight: bold;\">🔌 34</div>\n      <div style=\"font-size: 14px; color: #ccc;\">Active Sensors</div>\n    </div>\n    <div style=\"text-align: center;\">\n      <div style=\"font-size: 32px; font-weight: bold;\">💡 17%</div>\n      <div style=\"font-size: 14px; color: #ccc;\">Avg. Energy Savings</div>\n    </div>\n    <div style=\"text-align: center;\">\n      <div style=\"font-size: 32px; font-weight: bold;\">🏭 5</div>\n      <div style=\"font-size: 14px; color: #ccc;\">Monitored Stations</div>\n    </div>\n  </div>\n\n  <!-- Navigation Buttons -->\n  <div style=\"text-align: center; margin-top: 20px;\">\n    <div style=\"margin-bottom: 10px;\">\n      <a href=\"/d/eelhu347owdfkb/actuator-control\" style=\"display: inline-block; background: #34495e; color: white; padding: 12px 24px; margin: 10px; border-radius: 6px; font-weight: bold; text-decoration: none;\">🔧 Actuator Control</a>\n      <a href=\"/d/aelgn1bny1la8f/anomalies-records\" style=\"display: inline-block; background: #34495e; color: white; padding: 12px 24px; margin: 10px; border-radius: 6px; font-weight: bold; text-decoration: none;\">📉 Anomalies Records</a>\n      <a href=\"/d/aelhqr876v2f4c/change-rules\" style=\"display: inline-block; background: #34495e; color: white; padding: 12px 24px; margin: 10px; border-radius: 6px; font-weight: bold; text-decoration: none;\">⚙️ Change Rules</a>\n    </div>\n    <div>\n      <a href=\"/d/aekojnrjuwydcd/measurements-dashboard\" style=\"display: inline-block; background: #34495e; color: white; padding: 12px 24px; margin: 10px; border-radius: 6px; font-weight: bold; text-decoration: none;\">📊 Measurements Dashboard</a>\n      <a href=\"/d/b5702c37-477d-4063-9601-01f5a1b24e9e/station-metrics\" style=\"display: inline-block; background: #34495e; color: white; padding: 12px 24px; margin: 10px; border-radius: 6px; font-weight: bold; text-decoration: none;\">🏭 Station Metrics</a>\n    </div>\n  </div>\n\n  <!-- Footer -->\n  <div style=\"margin-top: 60px; text-align: center; font-size: 14px; color: #888;\">\n    © 2025 GMAN — Green Manufacturing Platform Powered by SINF 41\n  </div>\n\n</div>\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.6.0-226762",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [
+    "Home page"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Home",
+  "uid": "930122ff-4ef3-4351-ae53-f38ad5c228b0",
+  "version": 12
+}

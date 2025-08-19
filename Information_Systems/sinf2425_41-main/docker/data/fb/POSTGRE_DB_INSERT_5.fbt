@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Name="POSTGRE_DB_INSERT_5" OpcUa="SERVICE">
+    <InterfaceList>
+        <EventInputs>
+            <Event Name="INIT" Type="Event"/>
+            <Event Name="RUN" Type="Event">
+                <With Var="DATA"/>
+                <With Var="SENSOR_ID_LIST"/>
+            </Event>
+        </EventInputs>
+        <EventOutputs>
+            <Event Name="INIT_O" Type="Event"/>
+            <Event Name="RUN_O" Type="Event">
+                <With Var="RESULT"/>
+            </Event>
+        </EventOutputs>
+        <InputVars>
+            <VarDeclaration Name="HOST"           Type="STRING"/>
+            <VarDeclaration Name="PORT"           Type="UINT"/>
+            <VarDeclaration Name="USER"           Type="STRING"/>
+            <VarDeclaration Name="PASSWORD"       Type="STRING"/>
+            <VarDeclaration Name="DBNAME"         Type="STRING"/>
+            <VarDeclaration Name="SCHEMA"         Type="STRING"/>
+            <VarDeclaration Name="TABLE"          Type="STRING"/>
+            <VarDeclaration Name="DATA"           Type="STRING"/>
+        </InputVars>
+        <OutputVars>
+            <VarDeclaration Name="RESULT" Type="STRING"/>
+        </OutputVars>
+    </InterfaceList>
+</FBType>

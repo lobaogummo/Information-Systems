@@ -1,0 +1,269 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 4,
+  "links": [],
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"\n  width: 100%;\n  height: 100px;\n  background: linear-gradient(135deg, #27ae60, #2ecc71);\n  color: white;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 0 30px;\n  font-size: 20px;\n  font-weight: bold;\n  border-radius: 8px;\n  box-sizing: border-box;\n\">\n  <div>🔧 Actuator Control Dashboard</div>\n  <div>\n    <a href=\"/d/930122ff-4ef3-4351-ae53-f38ad5c228b0/home\" style=\"\n      color: white;\n      text-decoration: underline;\n      font-size: 14px;\n      font-weight: normal;\n      text-decoration: none;\n    \">\n      ⬅ Back to Home\n    </a>\n  </div>\n</div>",
+        "mode": "html"
+      },
+      "pluginVersion": "11.6.0-226762",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "fekohikosxzwgd"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.0-226762",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "fekohikosxzwgd"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1) DML de add/edit/delete\r\nDO $$\r\nBEGIN\r\n  IF '${action}' = 'delete'\r\n     AND NULLIF('${actuator_id}','') IS NOT NULL\r\n  THEN\r\n    DELETE FROM dinasore.actuator\r\n    WHERE actuator_id = NULLIF('${actuator_id}','')::integer;\r\n  END IF;\r\n\r\n  IF '${action}' = 'edit'\r\n     AND NULLIF('${actuator_id}','') IS NOT NULL\r\n  THEN\r\n    UPDATE dinasore.actuator\r\n    SET\r\n      type       = COALESCE(NULLIF('${actuator_type}',''),    type),\r\n      estado     = CASE WHEN '${actuator_estado}' = 'true'  THEN TRUE\r\n                        WHEN '${actuator_estado}' = 'false' THEN FALSE\r\n                        ELSE estado END,\r\n      rule_id    = COALESCE(NULLIF('${actuator_rule_id}','')::integer, rule_id),\r\n      station_id = COALESCE(NULLIF('${actuator_station_id}','')::integer, station_id)\r\n    WHERE actuator_id = NULLIF('${actuator_id}','')::integer;\r\n  END IF;\r\n\r\n  IF '${action}' = 'add'\r\n     AND NULLIF('${actuator_type}','') IS NOT NULL\r\n  THEN\r\n    INSERT INTO dinasore.actuator(type,estado,rule_id,station_id)\r\n    VALUES(\r\n      '${actuator_type}',\r\n      CASE WHEN '${actuator_estado}' = 'true' THEN TRUE ELSE FALSE END,\r\n      NULLIF('${actuator_rule_id}','')::integer,\r\n      NULLIF('${actuator_station_id}','')::integer\r\n    );\r\n  END IF;\r\nEND\r\n$$;\r\n\r\n-- 2) Consulta principal (só leitura)\r\nSELECT\r\n  CASE WHEN '${action}' = 'add' THEN NULL ELSE a.actuator_id END AS actuator_id,\r\n  COALESCE(NULLIF('${actuator_type}',''),    a.type)       AS actuator_type,\r\n  CASE\r\n    WHEN '${action}' = 'add'  THEN (CASE WHEN '${actuator_estado}' = 'true'  THEN TRUE ELSE FALSE END)\r\n    WHEN '${action}' = 'edit' THEN (CASE WHEN '${actuator_estado}' = 'true'  THEN TRUE\r\n                                         WHEN '${actuator_estado}' = 'false' THEN FALSE\r\n                                         ELSE a.estado END)\r\n    ELSE a.estado\r\n  END                                                         AS actuator_estado,\r\n  COALESCE(NULLIF('${actuator_rule_id}','')::integer, a.rule_id)     AS actuator_rule_id,\r\n  COALESCE(NULLIF('${actuator_station_id}','')::integer, a.station_id) AS actuator_station_id\r\nFROM dinasore.actuator a\r\nWHERE\r\n     '${action}' = 'view'    -- em VIEW, traz tudo\r\n  OR '${action}' = 'add'     -- em ADD, também não filtra\r\n  OR (\r\n       '${action}' IN ('edit','delete')\r\n       AND a.actuator_id = NULLIF('${actuator_id}','')::integer\r\n     )\r\nORDER BY a.actuator_id;\r\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Panel Title",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "view",
+          "value": "view"
+        },
+        "name": "action",
+        "options": [
+          {
+            "selected": false,
+            "text": "null",
+            "value": "null"
+          },
+          {
+            "selected": true,
+            "text": "view",
+            "value": "view"
+          },
+          {
+            "selected": false,
+            "text": "add",
+            "value": "add"
+          },
+          {
+            "selected": false,
+            "text": "edit",
+            "value": "edit"
+          },
+          {
+            "selected": false,
+            "text": "delete",
+            "value": "delete"
+          }
+        ],
+        "query": "null,view,add,edit,delete",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "actuator_station_id",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "actuator_id",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "actuator_rule_id",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "actuator_type",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "name": "actuator_estado",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "2025-03-09T08:26:51.333Z",
+    "to": "2025-07-15T08:26:51.333Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Actuator Control",
+  "uid": "eelhu347owdfkb",
+  "version": 27
+}
